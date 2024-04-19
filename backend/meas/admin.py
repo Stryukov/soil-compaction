@@ -26,7 +26,7 @@ class TestingLocationAdmin(admin.ModelAdmin):
         'name',
         'area',
     )
-    search_fields = ('name','area__name')
+    search_fields = ('name', 'area__name')
     list_filter = ('area',)
 
 
