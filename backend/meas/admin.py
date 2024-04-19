@@ -68,9 +68,10 @@ class InvoceAdmin(admin.ModelAdmin):
     list_display = (
         'number',
         'billed_at',
+        'customer',
         'status',
     )
-    list_filter = ('status', 'billed_at')
+    list_filter = ('status', 'billed_at', 'customer__name')
     list_editable = ('status',)
 
     def get_form(self, request, obj=None, **kwargs):
