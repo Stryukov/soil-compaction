@@ -82,6 +82,13 @@ class Measurement(models.Model):
     )
     layer = models.CharField('Слой', max_length=50)
     material = models.CharField('Материал', max_length=50)
+    create_docs = models.BooleanField('Созданы документы')
+    protocol = models.FileField(
+        'Протокол', upload_to='docs/protocol/%Y/%m/%d', null=True, blank=True
+    )
+    work_request = models.FileField(
+        'Заявка', upload_to='docs/request/%Y/%m/%d', null=True, blank=True
+    )
 
     class Meta:
         verbose_name = 'Измерения'
@@ -95,6 +102,9 @@ class Measurement(models.Model):
 class Invoce(models.Model):
     number = models.CharField('Номер счета', max_length=20)
     billed_at = models.DateField('Дата счета')
+    customer = models.ForeignKey(
+        Customer, on_delete=models.DO_NOTHING, verbose_name='Заказчик'
+    )
     measurement = models.ManyToManyField(Measurement)
     status = models.CharField(
         'Статус',

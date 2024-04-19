@@ -56,6 +56,7 @@ class MeasurementAdmin(admin.ModelAdmin):
         'testing_location',
         'layer',
         'material',
+        'create_docs',
     )
     search_fields = ('testing_location',)
     list_filter = ('visited_at',)
