@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Customer, Area, TestingLocation, DeviceReadings, Measurement, Invoce
+from .models import Customer, Area, TestingLocation, DeviceReadings, \
+    Measurement, Invoce
 
 
 @admin.register(Customer)
@@ -43,6 +44,11 @@ class DeviceReadingsAdmin(admin.ModelAdmin):
     search_fields = ('created_at',)
 
 
+class DeviceReadingsInline(admin.TabularInline):
+    model = DeviceReadings
+    extra = 0
+
+
 @admin.register(Measurement)
 class MeasurementAdmin(admin.ModelAdmin):
     list_display = (
@@ -50,15 +56,10 @@ class MeasurementAdmin(admin.ModelAdmin):
         'testing_location',
         'layer',
         'material',
-        'device_readings',
     )
     search_fields = ('testing_location',)
     list_filter = ('visited_at',)
-
-
-class Measurementinline(admin.TabularInline):
-    model = Measurement
-    extra = 1
+    inlines = [DeviceReadingsInline,]
 
 
 @admin.register(Invoce)
@@ -70,4 +71,13 @@ class InvoceAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', 'billed_at')
     list_editable = ('status',)
-    inlines = [Measurementinline,]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj:
+            form.base_fields['measurement'].queryset = \
+                Measurement.objects.filter(invoce=obj)
+        else:
+            form.base_fields['measurement'].queryset = \
+                Measurement.objects.filter(invoce__isnull=True)
+        return form

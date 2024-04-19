@@ -60,6 +60,9 @@ class DeviceReadings(models.Model):
         max_length=100,
         default='Измеритель модуля упругости грунтов и основания дорог ПДУ-МГ4'
     )
+    measurement = models.ForeignKey(
+        'Measurement', on_delete=models.SET_NULL, null=True
+    )
 
     class Meta:
         verbose_name = 'Данные с устройства'
@@ -70,9 +73,29 @@ class DeviceReadings(models.Model):
         return f'Удар №{self.blow_number} {self.created_at}'
 
 
+class Measurement(models.Model):
+    visited_at = models.DateField('Дата выезда')
+    testing_location = models.ForeignKey(
+        TestingLocation,
+        on_delete=models.CASCADE,
+        verbose_name='Место испытаний'
+    )
+    layer = models.CharField('Слой', max_length=50)
+    material = models.CharField('Материал', max_length=50)
+
+    class Meta:
+        verbose_name = 'Измерения'
+        verbose_name_plural = 'Измерения'
+        ordering = ['-visited_at']
+
+    def __str__(self):
+        return f'{self.testing_location} ({self.visited_at})'
+
+
 class Invoce(models.Model):
     number = models.CharField('Номер счета', max_length=20)
     billed_at = models.DateField('Дата счета')
+    measurement = models.ManyToManyField(Measurement)
     status = models.CharField(
         'Статус',
         choices=INVOCE_STATUS_CHOICES,
@@ -87,31 +110,3 @@ class Invoce(models.Model):
 
     def __str__(self):
         return f'Счет №{self.number}  от {self.billed_at}'
-
-
-class Measurement(models.Model):
-    visited_at = models.DateField('Дата выезда')
-    testing_location = models.ForeignKey(
-        TestingLocation,
-        on_delete=models.CASCADE,
-        verbose_name='Место испытаний'
-    )
-    invoce = models.ForeignKey(
-        Invoce, on_delete=models.DO_NOTHING, related_name='invoce', null=True
-    )
-    layer = models.CharField('Слой', max_length=50)
-    material = models.CharField('Материал', max_length=50)
-    device_readings = models.ForeignKey(
-        DeviceReadings,
-        on_delete=models.CASCADE,
-        related_name='device_readings',
-        verbose_name='Данные с устройства',
-    )
-
-    class Meta:
-        verbose_name = 'Измерения'
-        verbose_name_plural = 'Измерения'
-        ordering = ['-visited_at']
-
-    def __str__(self):
-        return f'{self.testing_location} ({self.visited_at})'
