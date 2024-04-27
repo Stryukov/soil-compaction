@@ -48,6 +48,7 @@ class TestingLocation(models.Model):
 
 
 class DeviceReadings(models.Model):
+    tag_number = models.CharField('Номер метки', max_length=20)
     blow_number = models.CharField('Номер удара', max_length=20)
     created_at = models.DateField('Дата измерений')
     elastic_modulus = models.PositiveSmallIntegerField(
@@ -55,6 +56,9 @@ class DeviceReadings(models.Model):
     )
     movement = models.PositiveSmallIntegerField('Перемещение L, мкм')
     power_of_blow = models.PositiveSmallIntegerField('Сила Удара Fmax, H')
+    compaction_ratio = models.CharField(
+        'Коэффециент уплотнения', max_length=20
+    )
     device_type = models.CharField(
         'Тип устройства',
         max_length=100,
@@ -105,7 +109,7 @@ class Invoce(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.DO_NOTHING, verbose_name='Заказчик'
     )
-    measurement = models.ManyToManyField(Measurement)
+    measurement = models.ManyToManyField(Measurement, verbose_name='Измерения')
     status = models.CharField(
         'Статус',
         choices=INVOCE_STATUS_CHOICES,
