@@ -1,0 +1,49 @@
+version: '3.8'
+
+volumes:
+  pg_data:
+  static:
+  docs:
+
+networks:
+  meas-network:
+    name: meas-network
+
+services:
+
+  db:
+    image: postgres:16.2-alpine
+    restart: always
+    networks:
+      - meas-network
+    env_file: .env/dev.env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend/
+    restart: always   
+    env_file: .env/dev.env
+    volumes:
+      - docs:/app/docs
+      - static:/app/static
+    expose:
+      - 8000
+    networks:
+      - meas-network
+    depends_on:
+      - db
+
+  gateway:
+    build: ./gateway/
+    restart: always   
+    env_file: .env/dev.env
+    ports:
+      - 80:80
+    volumes:
+      - docs:/docs
+      - static:/static/
+    depends_on:
+      - backend
+    networks:
+      - meas-network
