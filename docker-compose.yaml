@@ -47,3 +47,36 @@ services:
       - backend
     networks:
       - meas-network
+
+  redis:
+    image: redis:7.0.5-alpine
+    restart: always
+    networks:
+      - meas-network    
+
+
+  worker:
+    build: ./backend/
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    restart: always 
+    env_file: .env/dev.env
+    volumes:
+      - ./backend:/app
+    networks:
+      - meas-network
+    depends_on:
+      - redis
+
+  flower:
+    build: ./backend/
+    entrypoint: celery
+    command: -A celery_app.app flower
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - redis
+    networks:
+      - meas-network
+    ports:
+      - 5555:5555
