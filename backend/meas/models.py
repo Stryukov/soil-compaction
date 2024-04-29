@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from meas.tasks import create_protocol
 
 
 INVOCE_STATUS_CHOICES = (
@@ -101,6 +105,12 @@ class Measurement(models.Model):
 
     def __str__(self):
         return f'{self.testing_location} ({self.visited_at})'
+
+
+@receiver(post_save, sender=Measurement)
+def create_docs(sender, instance, created, **kwargs):
+    if instance.create_docs and not instance.protocol:
+        create_protocol.delay_on_commit(instance.pk)
 
 
 class Invoce(models.Model):

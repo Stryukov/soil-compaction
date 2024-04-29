@@ -13,7 +13,7 @@ services:
 
   db:
     image: postgres:16.2-alpine
-    restart: always
+    restart: unless-stopped
     networks:
       - meas-network
     env_file: .env/dev.env
@@ -22,7 +22,8 @@ services:
 
   backend:
     build: ./backend/
-    restart: always   
+    entrypoint: /app/app-entrypoint.sh
+    restart: unless-stopped
     env_file: .env/dev.env
     volumes:
       - docs:/app/docs
@@ -50,30 +51,26 @@ services:
 
   redis:
     image: redis:7.0.5-alpine
-    restart: always
+    restart: unless-stopped
     networks:
       - meas-network    
 
-
   worker:
     build: ./backend/
-    entrypoint: celery
-    command: -A celery_app.app worker --loglevel=info
-    restart: always 
+    entrypoint: /app/worker-entrypoint.sh
+    restart: unless-stopped 
     env_file: .env/dev.env
-    volumes:
-      - ./backend:/app
     networks:
       - meas-network
     depends_on:
+      - backend
       - redis
 
   flower:
     build: ./backend/
     entrypoint: celery
     command: -A celery_app.app flower
-    volumes:
-      - ./backend:/app
+    restart: unless-stopped
     depends_on:
       - redis
     networks:

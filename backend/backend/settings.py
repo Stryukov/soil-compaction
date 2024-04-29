@@ -118,4 +118,25 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    },
+}
