@@ -60,6 +60,8 @@ services:
     entrypoint: /app/worker-entrypoint.sh
     restart: unless-stopped 
     env_file: .env/dev.env
+    volumes:
+      - docs:/app/docs    
     networks:
       - meas-network
     depends_on:

@@ -4,3 +4,4 @@ psycopg2-binary==2.9.9
 gunicorn==22.0.0
 celery[redis]==5.4.0
 flower==2.0.1
+docxtpl==0.16.8

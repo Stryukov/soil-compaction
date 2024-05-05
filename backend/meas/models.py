@@ -26,6 +26,14 @@ class Customer(models.Model):
 
 class Area(models.Model):
     name = models.CharField('Наименование', max_length=100)
+    mark = models.CharField('Маркировка', max_length=10)
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.SET_NULL,
+        related_name='customer',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Площадка'
