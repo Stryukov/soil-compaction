@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from meas.tasks import create_protocol
 
 
 INVOCE_STATUS_CHOICES = (
@@ -22,6 +26,14 @@ class Customer(models.Model):
 
 class Area(models.Model):
     name = models.CharField('Наименование', max_length=100)
+    mark = models.CharField('Маркировка', max_length=10)
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.SET_NULL,
+        related_name='customer',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Площадка'
@@ -101,6 +113,12 @@ class Measurement(models.Model):
 
     def __str__(self):
         return f'{self.testing_location} ({self.visited_at})'
+
+
+@receiver(post_save, sender=Measurement)
+def create_docs(sender, instance, created, **kwargs):
+    if instance.create_docs and not instance.protocol:
+        create_protocol.delay_on_commit(instance.pk)
 
 
 class Invoce(models.Model):
