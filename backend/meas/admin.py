@@ -16,8 +16,10 @@ class CustomerAdmin(admin.ModelAdmin):
 class AreaAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'customer'
     )
-    search_fields = ('name',)
+    search_fields = ('name', 'customer__name')
+    list_filter = ('customer__name',)
 
 
 @admin.register(TestingLocation)
@@ -34,6 +36,7 @@ class TestingLocationAdmin(admin.ModelAdmin):
 class DeviceReadingsAdmin(admin.ModelAdmin):
     list_display = (
         'created_at',
+        'tag_number',
         'blow_number',
         'elastic_modulus',
         'movement',

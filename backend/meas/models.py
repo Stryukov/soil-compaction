@@ -29,6 +29,7 @@ class Area(models.Model):
     mark = models.CharField('Маркировка', max_length=10)
     customer = models.ForeignKey(
         Customer,
+        verbose_name='Заказчик',
         on_delete=models.SET_NULL,
         related_name='customer',
         null=True,
