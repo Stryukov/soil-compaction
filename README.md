@@ -48,7 +48,7 @@
 
 **Client:** Django Admin
 
-**Server:** Django, Postgres, Gunicorn, Celery, python-docx-template
+**Server:** Django, Celery, Redis, Postgres, Nginx, Docker, python-docx-template
 
 
 ## Authors
